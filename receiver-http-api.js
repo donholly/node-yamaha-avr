@@ -108,7 +108,7 @@ function HttpAPI(settings) {
 
 	function increaseVolume(value, res){
 		yamaha.getVolume().then(function(result){
-			var newVolume = parseInt(result)-30;
+			var newVolume = parseInt(result)+50;
 			console.log("Increasing volume to " + newVolume);
 			yamaha.setVolume(newVolume).then(function(result) {
 				console.log("Volume is now set to " + result);
@@ -119,7 +119,7 @@ function HttpAPI(settings) {
 
 	function decreaseVolume(value, res){
 		yamaha.getVolume().then(function(result){
-			var newVolume = parseInt(result)+30;
+			var newVolume = parseInt(result)-50;
 			console.log("Decreasing volume to " + newVolume);
 			yamaha.setVolume(newVolume).then(function(result) {
 				finishResponseWithJSONResult({"volume" :result}, res);
