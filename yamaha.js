@@ -74,14 +74,16 @@ Yamaha.prototype.getVolume = function(){
 };
 
 Yamaha.prototype.setVolume = function(volume){
-
-  // Safety: Do not set volume ever too loud
-  if (volume < 200)
-    volume = 200;
-
   var xml = this.commands.setVolumeCommand(volume);
   return deferredAction(this.getUrl(), xml, function(result){
-    return result.YAMAHA_AV.Main_Zone[0].Volume[0].Lvl[0].Val[0];
+    // this value isn't here... :(
+    //return result.YAMAHA_AV.Main_Zone[0].Volume[0].Lvl[0].Val[0];
+    var respCode = result.YAMAHA_AV["$"]["RC"];
+    if (respCode && parseInt(respCode) == 0) {
+      return volume;
+    } else {
+      return -100;
+    }
   });
 };
 
@@ -116,6 +118,8 @@ function deferredAction(url, commandXml, parseAction){
 }
 
 function getCommandReply(url, commandXml){
+
+  console.log(commandXml);
 
   var deferred = Q.defer();
   var request = Request.post({
