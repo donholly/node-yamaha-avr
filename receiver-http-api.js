@@ -4,6 +4,7 @@ function HttpAPI(settings) {
 
 	var Yamaha = require('./yamaha.js');
 
+	// ideally get this from the 'settings' object!
 	var ip = "192.168.1.31"
 
 	console.log("Connecting to: " + ip);
