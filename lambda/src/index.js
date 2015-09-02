@@ -33,6 +33,11 @@ EchoYamaha.prototype.intentHandlers = {
         console.log("VolumeUpIntent received");
         options.path = '/receiver/volume/down';
         httpreq(options, response, "OK");
+    },
+    PlayIntent: function (intent, session, response) {
+        console.log("PlayIntent received");
+        options.path = '/receiver/spotify';
+        httpreq(options, response, "Chillin, bro");
     }
 };
 
