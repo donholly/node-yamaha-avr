@@ -33,6 +33,16 @@ EchoYamaha.prototype.intentHandlers = {
         console.log("VolumeUpIntent received");
         options.path = '/receiver/volume/down';
         httpreq(options, response, "OK");
+    },
+    PlayIntent: function (intent, session, response) {
+        console.log("PlayIntent received");
+        options.path = '/sonos/spotify/' + encodeURIComponent(intent.slots.Playlist.value);
+        httpreq(options, response, "Playing " + intent.slots.Playlist.value + " playlist");
+    },
+    PartyIntent: function (intent, session, response) {
+        console.log("PlayIntent received");
+        options.path = '/receiver/party';
+        httpreq(options, response, "Let's party!");
     }
 };
 
