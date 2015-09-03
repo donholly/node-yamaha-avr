@@ -36,7 +36,7 @@ EchoYamaha.prototype.intentHandlers = {
     },
     PlayIntent: function (intent, session, response) {
         console.log("PlayIntent received");
-        options.path = '/sonos/spotify/' + encodeURIComponent(intent.slots.Playlist.value);
+        options.path = '/receiver/spotify/' + encodeURIComponent(intent.slots.Playlist.value);
         httpreq(options, response, "Playing " + intent.slots.Playlist.value + " playlist");
     },
     PartyIntent: function (intent, session, response) {
