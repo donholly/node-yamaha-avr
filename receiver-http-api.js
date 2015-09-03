@@ -196,6 +196,8 @@ function HttpAPI(settings) {
     			res.write(new Buffer(jsonResponse));
     		}
     		res.end();
+    	} else {
+    		console.warn("No response object to close...");
     	}
     };
 }
