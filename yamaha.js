@@ -77,7 +77,7 @@ Yamaha.prototype.setVolume = function(volume){
   var xml = this.commands.setVolumeCommand(volume);
   return deferredAction(this.getUrl(), xml, function(result){
     // this value isn't here... :(
-    //return result.YAMAHA_AV.Main_Zone[0].Volume[0].Lvl[0].Val[0];
+    //return result.YAMAHA_AV.Main_Zone[0].Volume[0].Lvl[0].Val[0]; 
     var respCode = result.YAMAHA_AV["$"]["RC"];
     if (respCode && parseInt(respCode) == 0) {
       return volume;

@@ -110,24 +110,26 @@ function HttpAPI(settings) {
 		}
 	};
 
-	function increaseVolume(value, res){
+	function increaseVolume(res){
 		yamaha.getVolume().then(function(result){
 			var newVolume = parseInt(result)+50;
 			console.log("Increasing volume to " + newVolume);
-			yamaha.setVolume(newVolume).then(function(result) {
-				console.log("Volume is now set to " + result);
-				finishResponseWithJSONResult({"volume" :result}, res);
-			});
+			setVolume(newVolume, res);
 		});
 	};
 
-	function decreaseVolume(value, res){
+	function decreaseVolume(res){
 		yamaha.getVolume().then(function(result){
 			var newVolume = parseInt(result)-50;
 			console.log("Decreasing volume to " + newVolume);
-			yamaha.setVolume(newVolume).then(function(result) {
-				finishResponseWithJSONResult({"volume" :result}, res);
-			});
+			setVolume(newVolume, res);
+		});
+	};
+
+	function setVolume(value, res){
+		yamaha.setVolume(value).then(function(result) {
+			console.log("Volume set to: ", result);
+			finishResponseWithJSONResult({"volume" :result}, res);
 		});
 	};
 
