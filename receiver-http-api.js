@@ -5,10 +5,7 @@ function HttpAPI(settings) {
 	// Reciever Control
 	var Yamaha = require('./yamaha.js');
 
-	// Spotify
-	var Mopidy = require('mopidy');
-
-	// ideally get this from the 'settings' object!
+	// TODO get this from the 'settings' object!
 	var ip = "192.168.1.31"
 
 	console.log("Connecting to: " + ip);
@@ -69,10 +66,6 @@ function HttpAPI(settings) {
 
 			var inputName = url.split('input/')[1].toUpperCase();
 			selectInput(inputName, res);
-
-		} else if (url.indexOf("spotify") > -1) {
-
-			handleSpotifyRequest(url, res);
 
 		} else {
 
@@ -148,48 +141,6 @@ function HttpAPI(settings) {
 			finishResponseWithJSONResult(result, res);
 		});
 	};
-
-	function handleSpotifyRequest(url, res){
-
-		// TODO use options for the input here
-		selectInput("HDMI4", null);
-		setVolume(-300, null);
-
-		var trackDesc = function (track) {
-			return track.name + " by " + track.artists[0].name + " from " + track.album.name;
-		};
-
-		var queueAndPlay = function (playlistNum, trackNum) {
-			
-			playlistNum = playlistNum || 0;
-			trackNum = trackNum || 0;
-			
-			console.log("Playlist Number: " + playlistNum + "   Track Number: " + trackNum);
-
-			mopidy.playlists.getPlaylists().then(function (playlists) {
-				var playlist = playlists[playlistNum];
-				console.log("Loading playlist:", playlist.name);
-				return mopidy.tracklist.add(playlist.tracks).then(function (tlTracks) {
-					return mopidy.playback.play(tlTracks[trackNum]).then(function () {
-						return mopidy.playback.getCurrentTrack().then(function (track) {
-							console.log("Now playing:", trackDesc(track));
-						});
-					});
-				});
-				finishResponseWithJSONResult(null, res);
-			})
-            .catch(console.error.bind(console)) // Handle errors here
-            .done();                            // ...or they'll be thrown here
-            finishResponseWithJSONResult(null, res);
-        };
-
-        var mopidy = new Mopidy({
-        	webSocketUrl: "ws://192.168.1.230:6680/mopidy/ws/"
-        });
-        mopidy.on(console.log.bind(console));  // Log all events
-        mopidy.on("state:online", queueAndPlay);
-
-    };
 
     function finishResponseWithJSONResult(value, res) {
     	if (res) {
