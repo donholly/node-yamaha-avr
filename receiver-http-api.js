@@ -12,7 +12,7 @@ function HttpAPI(settings) {
 
 	var yamaha = new Yamaha(ip);
 
-	this.requestHandler = function (req, res) {
+	this.requestHandler = function(req, res) {
 
 		var url = req.url.toLowerCase();
 
@@ -95,7 +95,7 @@ function HttpAPI(settings) {
 		});
 	};
 
-	function setPowerState(state, res){
+	this.setPowerState = function(state, res){
 		if (state) {
 			yamaha.setPower("on").then(function(result) {
 				finishResponseWithJSONResult(result, res);
@@ -107,7 +107,7 @@ function HttpAPI(settings) {
 		}
 	};
 
-	function increaseVolume(res){
+	this.increaseVolume = function(res){
 		yamaha.getVolume().then(function(result){
 			var newVolume = parseInt(result)+50;
 			console.log("Increasing volume to " + newVolume);
@@ -115,7 +115,7 @@ function HttpAPI(settings) {
 		});
 	};
 
-	function decreaseVolume(res){
+	this.decreaseVolume = function(res){
 		yamaha.getVolume().then(function(result){
 			var newVolume = parseInt(result)-50;
 			console.log("Decreasing volume to " + newVolume);
@@ -123,20 +123,20 @@ function HttpAPI(settings) {
 		});
 	};
 
-	function setVolume(value, res){
+	this.setVolume = function(value, res){
 		yamaha.setVolume(value).then(function(result) {
 			console.log("Volume set to: ", result);
 			finishResponseWithJSONResult({"volume" :result}, res);
 		});
 	};
 
-	function mute(value, res){
+	this.mute = function(value, res){
 		yamaha.setMute(value ? "on" : "off").then(function(result){
 			finishResponseWithJSONResult(result, res);
 		});
 	};
 
-	function selectInput(value, res){
+	this.selectInput = function(value, res){
 		yamaha.setInput(value).then(function(result){
 			finishResponseWithJSONResult(result, res);
 		});
