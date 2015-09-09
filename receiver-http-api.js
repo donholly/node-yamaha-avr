@@ -2,7 +2,11 @@ var requireFu = require('require-fu');
 
 function HttpAPI(settings) {
 
+	// Reciever Control
 	var Yamaha = require('./yamaha.js');
+
+	// Spotify
+	var Mopidy = require('mopidy');
 
 	// ideally get this from the 'settings' object!
 	var ip = "192.168.1.31"
