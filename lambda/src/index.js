@@ -31,7 +31,7 @@ EchoYamaha.prototype.intentHandlers = {
     },
     VolumeUpIntent: function (intent, session, response) {
         console.log("VolumeUpIntent received");
-        options.path = '/receiver/volume/down';
+        options.path = '/receiver/volume/up';
         httpreq(options, response, "OK");
     },
     PlayIntent: function (intent, session, response) {
