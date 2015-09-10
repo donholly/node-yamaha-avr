@@ -1,5 +1,4 @@
-'use strict';
-
+var winston = require('winston');
 var requireFu = require('require-fu');
 
 function HttpAPI(settings) {
@@ -10,7 +9,7 @@ function HttpAPI(settings) {
 	// TODO get this from the 'settings' object!
 	var ip = "192.168.1.31"
 
-	console.log("Connecting to: " + ip);
+	winston.info("Connecting to: " + ip);
 
 	var yamaha = new Yamaha(ip);
 
@@ -26,26 +25,26 @@ function HttpAPI(settings) {
 		} else if (url.indexOf("power") > -1) {
 
 			if (url.indexOf("on") > -1) {
-				console.log("Powering On Receiver");
+				winston.info("Powering On Receiver");
 				this.setPowerState(true, res);
 			} else if (url.indexOf("off") > -1) {
-				console.log("Powering Off Receiver");
+				winston.info("Powering Off Receiver");
 				this.setPowerState(false, res);
 			} else {
-				console.log("Unknown route: " + url);
+				winston.info("Unknown route: " + url);
 				finishResponseWithJSONResult(null, res);
 			}
 
 		} else if (url.indexOf("volume") > -1) {
 			
 			if (url.indexOf("up") > -1) {
-				console.log("Increasing Receiver Volume");
+				winston.info("Increasing Receiver Volume");
 				this.increaseVolume(res);
 			} else if (url.indexOf("down") > -1) {
-				console.log("Decreasing Receiver Volume");
+				winston.info("Decreasing Receiver Volume");
 				this.decreaseVolume(res);
 			} else {
-				console.log("Getting Current Volume");
+				winston.info("Getting Current Volume");
 				yamaha.getVolume(res).then(function(result){
 					finishResponseWithJSONResult(result, res);
 				});
@@ -54,13 +53,13 @@ function HttpAPI(settings) {
 		} else if (url.indexOf("mute") > -1) {
 
 			if (url.indexOf("on") > -1) {
-				console.log("Muting Receiver Volume");
+				winston.info("Muting Receiver Volume");
 				this.mute(true, res);
 			} else if (url.indexOf("off") > -1) {
-				console.log("Unmuting Receiver Volume");
+				winston.info("Unmuting Receiver Volume");
 				this.mute(false, res);
 			} else {
-				console.log("Unknown route: " + url);
+				winston.info("Unknown route: " + url);
 				finishResponseWithJSONResult(null, res);
 			}
 
@@ -71,7 +70,7 @@ function HttpAPI(settings) {
 
 		} else {
 
-			console.log("Unknown route: " + url);
+			winston.info("Unknown route: " + url);
 			finishResponseWithJSONResult(null, res);
 
 		}
@@ -79,15 +78,15 @@ function HttpAPI(settings) {
 
 	function GetState(){
 		yamaha.isOn().then(function(result){
-			console.log("Power on: ", result);
+			winston.info("Power on: ", result);
 		});
 
 		yamaha.getVolume().then(function(result){
-			console.log("Volume: ", result);
+			winston.info("Volume: ", result);
 		});
 
 		yamaha.getStatus().then(function(result){
-			console.log("Status: %j", result);
+			winston.info("Status: %j", result);
 		});
 	}
 
@@ -110,9 +109,9 @@ function HttpAPI(settings) {
 	};
 
 	this.setVolume = function(value, res){
-		console.log("Setting volume to: ", value);
+		winston.info("Setting volume to: ", value);
 		yamaha.setVolume(value).then(function(result) {
-			console.log("Volume set to: ", result);
+			winston.info("Volume set to: ", result);
 			finishResponseWithJSONResult({"volume" :result}, res);
 		});
 	};
@@ -121,7 +120,7 @@ function HttpAPI(settings) {
 		var parent = this;
 		yamaha.getVolume().then(function(result){
 			var newVolume = parseInt(result)+50;
-			console.log("Increasing volume to " + newVolume);
+			winston.info("Increasing volume to " + newVolume);
 			parent.setVolume(newVolume, res);
 		});
 	};
@@ -130,7 +129,7 @@ function HttpAPI(settings) {
 		var parent = this;
 		yamaha.getVolume().then(function(result){
 			var newVolume = parseInt(result)-50;
-			console.log("Decreasing volume to " + newVolume);
+			winston.info("Decreasing volume to " + newVolume);
 			parent.setVolume(newVolume, res);
 		});
 	};

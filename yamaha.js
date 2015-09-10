@@ -1,3 +1,4 @@
+var winston = require('winston');
 var Request = require('request');
 var Q = require('q');
 var StringFormat = require('string-format');
@@ -118,9 +119,6 @@ function deferredAction(url, commandXml, parseAction){
 }
 
 function getCommandReply(url, commandXml){
-
-  console.log(commandXml);
-
   var deferred = Q.defer();
   var request = Request.post({
     method: 'POST',
