@@ -1,3 +1,5 @@
+'use strict';
+
 var requireFu = require('require-fu');
 
 function HttpAPI(settings) {
@@ -5,17 +7,14 @@ function HttpAPI(settings) {
 	// Reciever Control
 	var Yamaha = require('./yamaha.js');
 
-	// Spotify
-	var Mopidy = require('mopidy');
-
-	// ideally get this from the 'settings' object!
+	// TODO get this from the 'settings' object!
 	var ip = "192.168.1.31"
 
 	console.log("Connecting to: " + ip);
 
 	var yamaha = new Yamaha(ip);
 
-	this.requestHandler = function (req, res) {
+	this.requestHandler = function(req, res) {
 
 		var url = req.url.toLowerCase();
 
@@ -28,10 +27,10 @@ function HttpAPI(settings) {
 
 			if (url.indexOf("on") > -1) {
 				console.log("Powering On Receiver");
-				setPowerState(true, res);
+				this.setPowerState(true, res);
 			} else if (url.indexOf("off") > -1) {
 				console.log("Powering Off Receiver");
-				setPowerState(false, res);
+				this.setPowerState(false, res);
 			} else {
 				console.log("Unknown route: " + url);
 				finishResponseWithJSONResult(null, res);
@@ -41,10 +40,10 @@ function HttpAPI(settings) {
 			
 			if (url.indexOf("up") > -1) {
 				console.log("Increasing Receiver Volume");
-				increaseVolume(res);
+				this.increaseVolume(res);
 			} else if (url.indexOf("down") > -1) {
 				console.log("Decreasing Receiver Volume");
-				decreaseVolume(res);
+				this.decreaseVolume(res);
 			} else {
 				console.log("Getting Current Volume");
 				yamaha.getVolume(res).then(function(result){
@@ -55,11 +54,11 @@ function HttpAPI(settings) {
 		} else if (url.indexOf("mute") > -1) {
 
 			if (url.indexOf("on") > -1) {
-				console.log("Increasing Receiver Volume");
-				mute(true, res);
+				console.log("Muting Receiver Volume");
+				this.mute(true, res);
 			} else if (url.indexOf("off") > -1) {
-				console.log("Decreasing Receiver Volume");
-				mute(false, res);
+				console.log("Unmuting Receiver Volume");
+				this.mute(false, res);
 			} else {
 				console.log("Unknown route: " + url);
 				finishResponseWithJSONResult(null, res);
@@ -68,11 +67,7 @@ function HttpAPI(settings) {
 		} else if (url.indexOf("input") > -1) {
 
 			var inputName = url.split('input/')[1].toUpperCase();
-			selectInput(inputName, res);
-
-		} else if (url.indexOf("spotify") > -1) {
-
-			handleSpotifyRequest(url, res);
+			this.selectInput(inputName, res);
 
 		} else {
 
@@ -102,7 +97,7 @@ function HttpAPI(settings) {
 		});
 	};
 
-	function setPowerState(state, res){
+	this.setPowerState = function(state, res){
 		if (state) {
 			yamaha.setPower("on").then(function(result) {
 				finishResponseWithJSONResult(result, res);
@@ -114,96 +109,57 @@ function HttpAPI(settings) {
 		}
 	};
 
-	function increaseVolume(res){
-		yamaha.getVolume().then(function(result){
-			var newVolume = parseInt(result)+50;
-			console.log("Increasing volume to " + newVolume);
-			setVolume(newVolume, res);
-		});
-	};
-
-	function decreaseVolume(res){
-		yamaha.getVolume().then(function(result){
-			var newVolume = parseInt(result)-50;
-			console.log("Decreasing volume to " + newVolume);
-			setVolume(newVolume, res);
-		});
-	};
-
-	function setVolume(value, res){
+	this.setVolume = function(value, res){
+		console.log("Setting volume to: ", value);
 		yamaha.setVolume(value).then(function(result) {
 			console.log("Volume set to: ", result);
 			finishResponseWithJSONResult({"volume" :result}, res);
 		});
 	};
 
-	function mute(value, res){
+	this.increaseVolume = function(res){
+		var parent = this;
+		yamaha.getVolume().then(function(result){
+			var newVolume = parseInt(result)+50;
+			console.log("Increasing volume to " + newVolume);
+			parent.setVolume(newVolume, res);
+		});
+	};
+
+	this.decreaseVolume = function(res){
+		var parent = this;
+		yamaha.getVolume().then(function(result){
+			var newVolume = parseInt(result)-50;
+			console.log("Decreasing volume to " + newVolume);
+			parent.setVolume(newVolume, res);
+		});
+	};
+
+	this.mute = function(value, res){
 		yamaha.setMute(value ? "on" : "off").then(function(result){
 			finishResponseWithJSONResult(result, res);
 		});
 	};
 
-	function selectInput(value, res){
+	this.selectInput = function(value, res){
 		yamaha.setInput(value).then(function(result){
 			finishResponseWithJSONResult(result, res);
 		});
 	};
 
-	function handleSpotifyRequest(url, res){
-
-		// TODO use options for the input here
-		selectInput("HDMI4", null);
-		setVolume(-300, null);
-
-		var trackDesc = function (track) {
-			return track.name + " by " + track.artists[0].name + " from " + track.album.name;
-		};
-
-		var queueAndPlay = function (playlistNum, trackNum) {
-			
-			playlistNum = playlistNum || 0;
-			trackNum = trackNum || 0;
-			
-			console.log("Playlist Number: " + playlistNum + "   Track Number: " + trackNum);
-
-			mopidy.playlists.getPlaylists().then(function (playlists) {
-				var playlist = playlists[playlistNum];
-				console.log("Loading playlist:", playlist.name);
-				return mopidy.tracklist.add(playlist.tracks).then(function (tlTracks) {
-					return mopidy.playback.play(tlTracks[trackNum]).then(function () {
-						return mopidy.playback.getCurrentTrack().then(function (track) {
-							console.log("Now playing:", trackDesc(track));
-						});
-					});
-				});
-				finishResponseWithJSONResult(null, res);
-			})
-            .catch(console.error.bind(console)) // Handle errors here
-            .done();                            // ...or they'll be thrown here
-            finishResponseWithJSONResult(null, res);
-        };
-
-        var mopidy = new Mopidy({
-        	webSocketUrl: "ws://192.168.1.230:6680/mopidy/ws/"
-        });
-        mopidy.on(console.log.bind(console));  // Log all events
-        mopidy.on("state:online", queueAndPlay);
-
-    };
-
-    function finishResponseWithJSONResult(value, res) {
-    	if (res) {
-    		if (value) {
-    			var jsonResponse = JSON.stringify(value);
-    			res.setHeader('Content-Length', Buffer.byteLength(jsonResponse));
-    			res.setHeader('Content-Type', 'application/json;charset=utf8');
-    			res.write(new Buffer(jsonResponse));
-    		}
-    		res.end();
-    	} else {
-    		console.warn("No response object to close...");
-    	}
-    };
+	function finishResponseWithJSONResult(value, res) {
+		if (res) {
+			if (value) {
+				var jsonResponse = JSON.stringify(value);
+				res.setHeader('Content-Length', Buffer.byteLength(jsonResponse));
+				res.setHeader('Content-Type', 'application/json;charset=utf8');
+				res.write(new Buffer(jsonResponse));
+			}
+			res.end();
+		} else {
+			console.warn("No response object to close...");
+		}
+	};
 }
 
 module.exports = HttpAPI;
