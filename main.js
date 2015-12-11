@@ -31,13 +31,8 @@ yamaha.isOnline().then(function(isOnline){
         yamaha.setPower(params);
         break;
       case 'v':
-        if (!Number.isInteger(params)){
-          winston.info("Parameter is not a number: " + params);
-          break;
-        }
-
         winston.info("Volume to: " + params);
-        yamaha.setVolume(params);
+        yamaha.setVolume(parseInt(params));
         break;
       case 'i':
           winston.info("Set intput to: " + params);
