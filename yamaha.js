@@ -78,7 +78,7 @@ Yamaha.prototype.setVolume = function(volume){
   var xml = this.commands.setVolumeCommand(volume);
   return deferredAction(this.getUrl(), xml, function(result){
     // this value isn't here... :(
-    //return result.YAMAHA_AV.Main_Zone[0].Volume[0].Lvl[0].Val[0]; 
+    //return result.YAMAHA_AV.Main_Zone[0].Volume[0].Lvl[0].Val[0];
     var respCode = result.YAMAHA_AV["$"]["RC"];
     if (respCode && parseInt(respCode) == 0) {
       return volume;
@@ -106,9 +106,16 @@ function deferredAction(url, commandXml, parseAction){
 
   var promise = getCommandReply(url, commandXml);
 
+  winston.info("Receiver URL: ", url);
+
+  winston.info("commandXML: ", commandXml);
+
   promise.then(function (response){
-    parseString(response, function (err, result){     
-      var res = parseAction(result);    
+
+    winston.info("Response: ", response);
+
+    parseString(response, function (err, result){
+      var res = parseAction(result);
       deferred.resolve(res);
     });
   }, function (error){

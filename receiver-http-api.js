@@ -36,7 +36,7 @@ function HttpAPI(settings) {
 			}
 
 		} else if (url.indexOf("volume") > -1) {
-			
+
 			if (url.indexOf("up") > -1) {
 				winston.info("Increasing Receiver Volume");
 				this.increaseVolume(res);
@@ -99,10 +99,12 @@ function HttpAPI(settings) {
 	this.setPowerState = function(state, res){
 		if (state) {
 			yamaha.setPower("on").then(function(result) {
+				winston.info("Power state set to: ", result)
 				finishResponseWithJSONResult(result, res);
 			});
 		} else {
 			yamaha.setPower("off").then(function(result) {
+				winston.info("Power state set to: ", result)
 				finishResponseWithJSONResult(result, res);
 			});
 		}
